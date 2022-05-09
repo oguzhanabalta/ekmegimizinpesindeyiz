@@ -2,7 +2,8 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import {useState} from "react";
 import {data} from "../ekmek-fiyat";
-import {Slider} from "@mui/material";
+import {Box, Slider, Stack, Typography} from "@mui/material";
+import {BakeryDiningRounded, CurrencyLira} from "@mui/icons-material";
 
 export default function Home() {
 
@@ -25,8 +26,6 @@ export default function Home() {
             setValue1([value1[0], Math.max(newValue[1], value1[0] + minDistance)]);
         }
     };
-    console.log(value1)
-
 
     return (
         <div className={styles.container}>
@@ -42,17 +41,18 @@ export default function Home() {
                 </h1>
 
 
-                <input className={styles.input} type="text" name="yil"
-                       placeholder={"Yıl Giriniz"}
-                       value={search_ekmek_yil}
-                       onChange={(event) => set_search_ekmek_yil(event.target.value)}
-                />
+                {/*<input className={styles.input} type="text" name="yil"*/}
+                {/*       placeholder={"Yıl Giriniz"}*/}
+                {/*       value={search_ekmek_yil}*/}
+                {/*       onChange={(event) => set_search_ekmek_yil(event.target.value)}*/}
+                {/*/>*/}
+                <Typography variant={"h4"}>Aşağıdaki barı kullanarak yıl aralıklarını belirleyebilirsiniz.</Typography>
                 <Slider
+                    sx={{color:"#0070f3", height:"10px"}}
                     getAriaLabel={() => 'Minimum distance'}
                     value={value1}
                     onChange={handleChange1}
                     valueLabelDisplay="auto"
-                    defaultValue={1990}
                     marks
                     min={1950}
                     max={2022}
@@ -61,27 +61,28 @@ export default function Home() {
 
 
                 <div className={styles.all}>
-                    {data.filter((e) => {
-                        if (value1[0] === 1950 && value1[1] === 2022) {
-                            return e;
-                        } else if (e.yil.includes(value1[0]) || e.yil.includes(value1[1])) {
-                            return e
-                            console.log(value1[1])
-                        }
-                    }).map((item, index) => {
+                    {data.slice(value1[0] - 1950, 73 -  (2022 - value1[1])).map((item, index) => {
                         return (
                             <div className={styles.card} key={index}>
-                                <p className={styles.description}>{item.yil}</p>
-                                <p>{item.ekmekfiyati} (1kg)</p>
-                                <p>1$ = {item.dolar} </p>
-                                <p>Asgari ücret: {item.asgariucret} TL</p>
+
+                                <Typography className={styles.description}>{item.yil}</Typography>
+                                <Box sx={{mt:2}}>
+                                    <Typography>{item.ekmekfiyati} <CurrencyLira sx={{color:"red", height:"20px", width:"20px"}}/> (1kg)</Typography>
+                                    <Typography>1$ = {item.dolar} <CurrencyLira sx={{color:"red", height:"20px", width:"20px"}}/> </Typography>
+                                    <Typography>Asgari ücret: {item.asgariucret} <CurrencyLira sx={{color:"red", height:"20px", width:"20px"}} /></Typography>
+                                </Box>
                                 <br/>
-                                <p>Kaç ekmek
-                                    alabiliyorum? <br/> {Math.floor(parseFloat(item.asgariucret) / parseFloat(item.ekmekfiyati))} KG
-                                </p>
+                                <Box sx={{display:"flex",flexDirection:"column", justifyContent:"center"}}>
+                                    <Typography><b style={{color:"red"}}>*</b>Kaç adet ekmek alabiliyorum?</Typography>
+                                    <Stack display={"flex"} flexDirection={"row"} gap={2}>
+                                        <Typography>{Math.floor(parseFloat(item.asgariucret) / parseFloat(item.ekmekfiyati) * 5)} adet</Typography>
+                                        <img height={"25px"} width={"25px"} style={{justifyContent:"center", alignItems:"center"}} src={"/bread.png"} alt={"ekmek"}/>
+                                    </Stack>
+
+                                </Box>
+
                             </div>
                         )
-
                     })
 
                     }
